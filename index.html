@@ -7,248 +7,236 @@
 
 <style>
 body{
-    margin:0;
-    height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background: linear-gradient(135deg,#ff758c,#ff7eb3);
-    font-family: Arial, sans-serif;
-    overflow:hidden;
+margin:0;
+font-family: 'Segoe UI', sans-serif;
+background:#f5e6d3;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+overflow:hidden;
 }
 
-/* CORAZON */
-.heart-container{
-    text-align:center;
-    cursor:pointer;
+/* CONTENEDOR */
+.container{
+text-align:center;
 }
 
-.heart{
-    width:150px;
-    height:150px;
-    position:relative;
-    transform: rotate(-45deg);
-    background:#ff2e63;
-    margin:auto;
-    animation: latido 1.2s infinite;
+/* CORAZON INICIAL */
+.heart-btn{
+width:140px;
+height:140px;
+background:red;
+position:relative;
+transform:rotate(-45deg);
+margin:auto;
+cursor:pointer;
+animation:beat 1.2s infinite;
+z-index:2;
 }
 
-.heart::before,
-.heart::after{
-    content:"";
-    width:150px;
-    height:150px;
-    position:absolute;
-    background:#ff2e63;
-    border-radius:50%;
+.heart-btn:before,
+.heart-btn:after{
+content:"";
+width:140px;
+height:140px;
+background:red;
+border-radius:50%;
+position:absolute;
 }
 
-.heart::before{
-    top:-75px;
-    left:0;
+.heart-btn:before{ top:-70px; left:0;}
+.heart-btn:after{ left:70px; top:0;}
+
+@keyframes beat{
+0%{ transform:scale(1) rotate(-45deg);}
+50%{ transform:scale(1.1) rotate(-45deg);}
+100%{ transform:scale(1) rotate(-45deg);}
 }
 
-.heart::after{
-    left:75px;
-    top:0;
-}
-
-@keyframes latido{
-    0%{ transform: rotate(-45deg) scale(1);}
-    50%{ transform: rotate(-45deg) scale(1.1);}
-    100%{ transform: rotate(-45deg) scale(1);}
-}
-
-.heart-text{
-    margin-top:25px;
-    color:white;
-    font-size:28px;
-    font-weight:bold;
+/* TEXTO CENTRAL */
+.main-text{
+position:absolute;
+width:100%;
+top:40%;
+left:0;
+font-size:28px;
+font-weight:bold;
+color:#5a1a1a;
+z-index:3;
+pointer-events:none;
 }
 
 /* CARTA */
-.carta{
-    position:absolute;
-    width:90%;
-    max-width:900px;
-    height:80%;
-    background:white;
-    border-radius:25px;
-    padding:30px;
-    display:none;
-    box-shadow:0 20px 50px rgba(0,0,0,0.3);
+.card{
+display:none;
+margin-top:20px;
+animation:fade 2s forwards;
+}
+
+@keyframes fade{
+from{opacity:0;}
+to{opacity:1;}
 }
 
 /* ARBOL */
-.arbol{
-    position:absolute;
-    left:50%;
-    top:50%;
-    transform:translate(-50%,-50%);
-    transition:1.5s;
+.tree{
+margin:auto;
+width:200px;
+height:300px;
+position:relative;
 }
 
-.arbol.move{
-    left:25%;
+.trunk{
+width:30px;
+height:0;
+background:#5c3a21;
+margin:auto;
+animation:growTrunk 2s forwards;
 }
 
-.heart-leaf{
-    position:absolute;
-    width:25px;
-    height:25px;
-    background:#ff4d6d;
-    transform: rotate(-45deg);
+@keyframes growTrunk{
+to{ height:150px;}
 }
 
-.heart-leaf::before,
-.heart-leaf::after{
-    content:"";
-    width:25px;
-    height:25px;
-    background:#ff4d6d;
-    border-radius:50%;
-    position:absolute;
+/* RAMAS */
+.branch{
+width:0;
+height:6px;
+background:#5c3a21;
+position:absolute;
+top:40%;
+animation:growBranch 2s forwards;
 }
 
-.heart-leaf::before{ top:-12px; }
-.heart-leaf::after{ left:12px; }
+.branch.left{ left:40%; transform:rotate(-35deg);}
+.branch.right{ right:40%; transform:rotate(35deg);}
 
-/* MENSAJE */
-.mensaje{
-    position:absolute;
-    right:5%;
-    top:20%;
-    width:45%;
-    opacity:0;
-    transition:2s;
+@keyframes growBranch{
+to{ width:90px;}
 }
 
-.mensaje.show{
-    opacity:1;
+/* CORAZONES FLORES */
+.leaf{
+width:22px;
+height:22px;
+background:red;
+position:absolute;
+transform:rotate(-45deg);
+opacity:0;
+animation:pop 1s forwards;
 }
 
-.mensaje h2{
-    color:#ff2e63;
+.leaf:before,
+.leaf:after{
+content:"";
+width:22px;
+height:22px;
+background:red;
+border-radius:50%;
+position:absolute;
+}
+
+.leaf:before{ top:-11px;}
+.leaf:after{ left:11px;}
+
+@keyframes pop{
+to{ opacity:1;}
+}
+
+/* FOTO */
+.photo{
+margin-top:20px;
+}
+
+.photo img{
+width:200px;
+border-radius:15px;
+box-shadow:0 5px 15px rgba(0,0,0,0.2);
 }
 
 /* CONTADOR */
-.contador{
-    position:absolute;
-    bottom:30px;
-    width:100%;
-    text-align:center;
-    font-size:20px;
-}
-
-/* YOUTUBE OCULTO */
-#youtubePlayer{
-    position:absolute;
-    width:1px;
-    height:1px;
-    opacity:0;
+.counter{
+margin-top:20px;
+font-size:20px;
+color:#5a1a1a;
+font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<!-- CORAZON -->
-<div class="heart-container" onclick="abrirCarta()" id="inicio">
-    <div class="heart"></div>
-    <div class="heart-text">San Valentín</div>
-</div>
+<div class="container">
 
-<!-- CARTA -->
-<div class="carta" id="carta">
+<div class="main-text">¿Hola Amoti quieres ser mi San Valentin?</div>
 
-    <div class="arbol" id="arbol"></div>
+<div class="heart-btn" onclick="openCard()"></div>
 
-    <div class="mensaje" id="mensaje">
-        <h2>Para ti ❤️</h2>
-        <p>
-Eres la razón de muchas de mis sonrisas.
-Gracias por estar en mi vida.
-Te amo infinitamente.
-        </p>
-    </div>
+<div class="card" id="card">
 
-    <div class="contador">
-        <b>Mi amor por ti comenzó hace:</b>
-        <div id="tiempo"></div>
-    </div>
+<div class="tree">
+<div class="trunk"></div>
+<div class="branch left"></div>
+<div class="branch right"></div>
 
-    <!-- MUSICA YOUTUBE -->
-    <iframe
-        id="youtubePlayer"
-        src="https://www.youtube.com/embed/OhJ-S9Nrh7Q?enablejsapi=1&autoplay=0&loop=1&playlist=OhJ-S9Nrh7Q"
-        frameborder="0"
-        allow="autoplay">
-    </iframe>
+<!-- CORAZONES -->
+<div class="leaf" style="top:20%; left:35%; animation-delay:2s"></div>
+<div class="leaf" style="top:18%; right:35%; animation-delay:2.3s"></div>
+<div class="leaf" style="top:10%; left:45%; animation-delay:2.6s"></div>
+<div class="leaf" style="top:10%; right:45%; animation-delay:2.9s"></div>
+<div class="leaf" style="top:5%; left:50%; animation-delay:3.2s"></div>
 
 </div>
+
+<h2>Te amo muchísimo ❤️</h2>
+
+<!-- FOTO PERSONAL -->
+<div class="photo">
+<img src="TU-FOTO.jpg" alt="Foto especial">
+</div>
+
+<div class="counter" id="counter"></div>
+
+</div>
+
+</div>
+
+<!-- MUSICA -->
+<iframe width="0" height="0"
+src="https://www.youtube.com/embed/OhJ-S9Nrh7Q?autoplay=1&loop=1&playlist=OhJ-S9Nrh7Q"
+frameborder="0"
+allow="autoplay">
+</iframe>
 
 <script>
 
-/* CREAR ARBOL */
-function crearArbol(){
-    const arbol = document.getElementById("arbol");
-
-    let posiciones = [
-        [0,0],[30,-40],[-30,-40],
-        [50,-80],[-50,-80],
-        [0,-120],
-        [20,-160],[-20,-160]
-    ];
-
-    posiciones.forEach((pos,i)=>{
-        setTimeout(()=>{
-            let h = document.createElement("div");
-            h.className="heart-leaf";
-            h.style.left = pos[0]+"px";
-            h.style.top = pos[1]+"px";
-            arbol.appendChild(h);
-        }, i*400);
-    });
-
-    setTimeout(()=>{
-        arbol.classList.add("move");
-        document.getElementById("mensaje").classList.add("show");
-    },4000);
+function openCard(){
+document.querySelector('.heart-btn').style.display='none';
+document.querySelector('.card').style.display='block';
 }
 
-/* ABRIR CARTA + MUSICA */
-function abrirCarta(){
-    document.getElementById("inicio").style.display="none";
-    document.getElementById("carta").style.display="block";
-    crearArbol();
+/* CONTADOR DESDE OCTUBRE 2024 */
+const startDate = new Date("2024-10-01T00:00:00");
 
-    // Iniciar musica (por click del usuario)
-    let iframe = document.getElementById("youtubePlayer");
-    iframe.src = "https://www.youtube.com/embed/OhJ-S9Nrh7Q?enablejsapi=1&autoplay=1&loop=1&playlist=OhJ-S9Nrh7Q";
+function updateCounter(){
+const now = new Date();
+const diff = now - startDate;
+
+const days = Math.floor(diff / (1000*60*60*24));
+const hours = Math.floor((diff / (1000*60*60)) % 24);
+const minutes = Math.floor((diff / (1000*60)) % 60);
+const seconds = Math.floor((diff / 1000) % 60);
+
+document.getElementById("counter").innerHTML =
+"Mi amor por ti comenzó hace:<br>" +
+days+" días "+
+hours+" horas "+
+minutes+" min "+
+seconds+" seg";
 }
 
-/* CONTADOR */
-/* FECHA OCTUBRE 2024 */
-let fechaInicio = new Date("2024-10-01T00:00:00");
-
-function actualizarTiempo(){
-    let ahora = new Date();
-    let diff = ahora - fechaInicio;
-
-    let dias = Math.floor(diff / (1000*60*60*24));
-    let horas = Math.floor(diff / (1000*60*60)) % 24;
-    let minutos = Math.floor(diff / (1000*60)) % 60;
-    let segundos = Math.floor(diff / 1000) % 60;
-
-    document.getElementById("tiempo").innerHTML =
-        dias+" días "+
-        horas+" horas "+
-        minutos+" min "+
-        segundos+" seg";
-}
-
-setInterval(actualizarTiempo,1000);
-actualizarTiempo();
+setInterval(updateCounter,1000);
 
 </script>
 
