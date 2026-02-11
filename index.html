@@ -1,220 +1,647 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Para Ti ❤️</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Poppins:wght@300;500&display=swap" rel="stylesheet">
-
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Carta - Secuencia Cine</title>
 <style>
-body{
-margin:0;
-overflow:hidden;
-background:#f6efe6;
-font-family:Poppins;
-}
+  :root{
+    --cream:#f6efe6;
+    --red:#ff1a4d;
+    --brown:#4b2e2e;
+    --text:#7a1c1c;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    height:100vh;
+    background:var(--cream);
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    overflow:hidden;
+    color:var(--text);
+  }
 
-#scene{
-position:fixed;
-width:100%;
-height:100%;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-}
+  /* Top title (typewriter) */
+  .title {
+    position: absolute;
+    width:100%;
+    top:6%;
+    text-align:center;
+    font-size:36px;
+    font-weight:600;
+    z-index:30;
+    pointer-events:none;
+  }
 
-/* CARTA */
-#envelope{
-width:220px;
-height:150px;
-background:#fff;
-border-radius:10px;
-box-shadow:0 20px 40px rgba(0,0,0,.2);
-cursor:pointer;
-display:flex;
-align-items:center;
-justify-content:center;
-transition:transform 1s;
-}
+  /* Central heart button to start */
+  .start-wrap{
+    position:absolute;
+    width:100%;
+    top:42%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:25;
+  }
+  .heart-btn{
+    width:170px;height:170px;
+    background:var(--red);
+    transform:rotate(-45deg);
+    border-radius:6px;
+    position:relative;
+    cursor:pointer;
+    box-shadow:0 10px 30px rgba(0,0,0,.12);
+    display:flex;
+    align-items:center;justify-content:center;
+    animation:beat 1.15s infinite;
+  }
+  .heart-btn::before,.heart-btn::after{
+    content:"";
+    position:absolute;
+    width:170px;height:170px;
+    background:var(--red);border-radius:50%;
+  }
+  .heart-btn::before{ top:-85px; left:0;}
+  .heart-btn::after{ left:85px; top:0;}
+  .start-label{
+    position:relative;
+    transform: rotate(45deg);
+    color:#fff;
+    font-weight:700;
+    pointer-events:none;
+    font-size:16px;
+    letter-spacing:.2px;
+  }
+  @keyframes beat{
+    0%,100%{ transform:scale(1) rotate(-45deg); }
+    50%{ transform:scale(1.12) rotate(-45deg); }
+  }
 
-#envelope:hover{
-transform:scale(1.05);
-}
+  /* Canvas fullscreen */
+  canvas{
+    position:absolute;
+    top:0; left:0;
+    width:100%; height:100%;
+    z-index:5;
+    display:none; /* shown after start */
+  }
 
-/* CONTENIDO */
-#content{
-position:absolute;
-top:0;
-left:0;
-width:100%;
-height:100%;
-display:none;
-flex-direction:column;
-align-items:center;
-justify-content:center;
-text-align:center;
-}
+  /* Envelope/card that opens */
+  .envelope{
+    position:absolute;
+    left:50%; top:50%;
+    transform:translate(-50%,-50%);
+    width:360px;height:240px;
+    background:rgba(255,255,255,0.98);
+    border-radius:14px;
+    box-shadow:0 30px 60px rgba(0,0,0,.12);
+    z-index:15;
+    display:none;
+    overflow:visible;
+  }
+  .flap{
+    position:absolute;
+    left:50%;
+    top:-160px;
+    transform-origin:bottom center;
+    transform:translateX(-50%) rotateX(0deg);
+    width:0;height:0;
+    border-left:180px solid transparent;
+    border-right:180px solid transparent;
+    border-bottom:160px solid #fff;
+    border-radius:6px;
+    box-shadow:0 10px 30px rgba(0,0,0,.08);
+  }
+  .flap.open{ animation:openFlap .9s forwards; transform-origin:bottom center; }
+  @keyframes openFlap{ to{ transform:translateX(-50%) rotateX(180deg);} }
 
-h1{
-font-family:"Great Vibes";
-font-size:55px;
-color:#b3002d;
-margin:20px;
-}
+  /* Secondary message (appears after sequence) */
+  .secondary{
+    position:absolute;
+    right:8%;
+    top:30%;
+    width:36%;
+    max-width:420px;
+    text-align:left;
+    z-index:28;
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity .9s ease, transform .9s ease;
+    font-size:20px;
+  }
+  .secondary.show{ opacity:1; transform:translateY(0); }
 
-#photo{
-width:200px;
-height:200px;
-border-radius:20px;
-object-fit:cover;
-box-shadow:0 10px 30px rgba(0,0,0,.3);
-margin-top:20px;
-}
+  .secondary h2{ color:var(--text); font-size:28px; margin:0 0 10px; }
+  .secondary p{ margin:0; color:#3f2222; line-height:1.45; }
 
-/* CANVAS */
-canvas{
-position:absolute;
-top:0;
-left:0;
-}
+  /* Counter */
+  .counter{
+    position:absolute;
+    bottom:6%;
+    width:100%;
+    text-align:center;
+    z-index:28;
+    font-weight:600;
+    color:var(--text);
+  }
 
-/* PARTICULAS */
-.particle{
-position:absolute;
-font-size:20px;
-animation:float 8s linear infinite;
-opacity:.7;
-}
-
-@keyframes float{
-0%{transform:translateY(100vh);}
-100%{transform:translateY(-10vh);}
-}
+  /* small responsiveness */
+  @media (max-width:900px){
+    .secondary{ display:none; } /* keep screen clean on mobile */
+    .envelope{ width:300px; height:200px; }
+    .heart-btn{ width:140px; height:140px; }
+    .title{ font-size:26px; top:8%; }
+  }
 </style>
 </head>
-
 <body>
 
-<audio autoplay loop>
-<source src="https://www.youtube.com/redirect?event=video_description&redir_token=QUFFLUhqa3Q1TFZ6Y1lJd0t3MElYa1VLREx3c0dOOVZxQXxBQ3Jtc0trNEZ5U2JvRXVUdHRBR2xNQmpYUTNSdElqMVBkVHBjTzN4R0lFejNnS2k4c3JITnd5Z1FfWnV2Q0dnQ3k2SzFhZ3lWb2lTQ2x1dDB2QklqSW9ERTRkWVRkTnF1Qy1Xb0g3d2lPNy1fNmRVdw&q=https%3A%2F%2Fwww.youtube.com%2Fwatch%3Fv%3DOhJ-S9Nrh7Q" type="audio/mpeg">
-</audio>
+<div class="title" id="title">¿Hola Amoti quieres ser mi San Valentin?</div>
 
-<div id="scene">
-
-<div id="envelope">💌 Abrir</div>
-
-<div id="content">
-<canvas id="treeCanvas"></canvas>
-<h1 id="text"></h1>
-<img id="photo" src="TU_FOTO_AQUI.jpg">
+<div class="start-wrap">
+  <div class="heart-btn" id="startBtn" aria-label="Abrir carta">
+    <div class="start-label">San Valentín</div>
+  </div>
 </div>
 
+<!-- envelope (appears briefly while tree grows) -->
+<div class="envelope" id="envelope" aria-hidden="true">
+  <div class="flap" id="flap"></div>
 </div>
 
+<!-- canvas where all animation happens -->
+<canvas id="stage"></canvas>
+
+<!-- secondary message (appears to right after tree forms) -->
+<div class="secondary" id="secondary">
+  <h2 id="secTitle">Te amo muchísimo ❤️</h2>
+  <p id="secText">Cada día a tu lado es un regalo. Gracias por cada risa, abrazo y momento compartido. ¿Quieres ser mi San Valentín?</p>
+</div>
+
+<div class="counter" id="counter">Mi amor por ti comenzó hace: -- días -- horas -- min -- seg</div>
+
+<!-- The YouTube iframe will be created after click to avoid autoplay blocking -->
 <script>
+/* -----------------------------
+   Config & elements
+   ----------------------------- */
+const startBtn = document.getElementById('startBtn');
+const envelope = document.getElementById('envelope');
+const flap = document.getElementById('flap');
+const canvas = document.getElementById('stage');
+const ctx = canvas.getContext('2d');
+const secondary = document.getElementById('secondary');
+const counterEl = document.getElementById('counter');
+const titleEl = document.getElementById('title');
 
-const envelope = document.getElementById("envelope");
-const content = document.getElementById("content");
-const text = document.getElementById("text");
+let W = canvas.width = window.innerWidth;
+let H = canvas.height = window.innerHeight;
+let animRunning = false;
 
-const message = "¿Hola Amoti quieres ser mi San Valentin?";
-let i=0;
+/* timeline control */
+let t0 = 0;
 
-envelope.onclick = () =>{
-envelope.style.display="none";
-content.style.display="flex";
-typeWriter();
-startTree();
-startParticles();
-}
+/* arrays for branches and heart-particles */
+let branches = [];
+let particles = []; // small hearts that will move to form canopy
+let canopyTargets = []; // points of the big heart-shape
+let particlesLaunched = 0;
 
-/* TEXTO MAQUINA */
-function typeWriter(){
-if(i < message.length){
-text.innerHTML += message.charAt(i);
-i++;
-setTimeout(typeWriter,60);
-}
-}
+/* audio iframe id and video id */
+const YT_ID = "OhJ-S9Nrh7Q";
+let ytIframe = null;
 
-/* PARTICULAS */
-function startParticles(){
-setInterval(()=>{
-const p=document.createElement("div");
-p.className="particle";
-p.innerHTML="❤️";
-p.style.left=Math.random()*100+"vw";
-p.style.fontSize=(15+Math.random()*25)+"px";
-document.body.appendChild(p);
+/* counter start date */
+const startDate = new Date("2024-10-01T00:00:00");
 
-setTimeout(()=>p.remove(),8000);
-},300);
-}
-
-/* ARBOL CINE */
-function startTree(){
-const canvas=document.getElementById("treeCanvas");
-const ctx=canvas.getContext("2d");
-
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-
-let branches=[];
-
-function branch(x,y,len,angle,width){
-branches.push({x,y,len,angle,width,progress:0});
-}
-
-branch(canvas.width/2,canvas.height-100,120,-90,12);
-
-function draw(){
-ctx.clearRect(0,0,canvas.width,canvas.height);
-
-branches.forEach(b=>{
-let x2=b.x + Math.cos(b.angle*Math.PI/180)*b.len*b.progress;
-let y2=b.y + Math.sin(b.angle*Math.PI/180)*b.len*b.progress;
-
-ctx.strokeStyle="#4b2e2e";
-ctx.lineWidth=b.width;
-ctx.beginPath();
-ctx.moveTo(b.x,b.y);
-ctx.lineTo(x2,y2);
-ctx.stroke();
-
-if(b.progress < 1){
-b.progress+=0.02;
-}else if(!b.split){
-b.split=true;
-
-if(b.width>2){
-branch(x2,y2,b.len*.7,b.angle-25,b.width*.7);
-branch(x2,y2,b.len*.7,b.angle+25,b.width*.7);
-}else{
-drawHeart(x2,y2);
-}
-}
+/* handle resize */
+window.addEventListener('resize',()=>{
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+  // regenerate canopy target positions for new size
+  generateCanopyTargets();
 });
 
-requestAnimationFrame(draw);
+/* -----------------------------
+   Utility: parametric heart shape
+   returns array of {x,y} points centered near top
+   scaled to canvas
+   ----------------------------- */
+function generateCanopyTargets(){
+  canopyTargets = [];
+  // Use classic parametric heart curve
+  // t from 0..2PI
+  const cx = W/2; // center x
+  const cy = H*0.28; // center y for canopy
+  // scale factors tuned to screen
+  const scale = Math.min(W, H) * 0.0175;
+  const n = 140; // number of target points
+  for(let i=0;i<n;i++){
+    const t = (i / n) * Math.PI * 2;
+    // classic heart formula (x,y)
+    const x = 16*Math.pow(Math.sin(t),3);
+    const y = 13*Math.cos(t) - 5*Math.cos(2*t) - 2*Math.cos(3*t) - Math.cos(4*t);
+    // flip y (we want heart pointing up)
+    const px = cx + x * scale;
+    const py = cy - y * scale;
+    // only keep top half area (filter some points to be natural)
+    canopyTargets.push({x:px + (Math.random()-0.5)*6, y:py + (Math.random()-0.5)*6, taken:false});
+  }
 }
 
-draw();
+/* -----------------------------
+   Branch system (procedural)
+   Each branch grows progressively (progress 0..1)
+   When a branch finishes it splits into 2 smaller branches
+   until width small -> we generate particle spawn points
+   ----------------------------- */
+function addInitialTrunk(){
+  branches = [];
+  // trunk: x,y,len,angle,width,progress,split flag
+  branches.push({
+    x: W/2,
+    y: H*0.78,
+    len: H*0.18,
+    angle: -90, // degrees (up)
+    width: 16,
+    progress: 0,
+    split:false
+  });
 }
 
-function drawHeart(x,y){
-const canvas=document.getElementById("treeCanvas");
-const ctx=canvas.getContext("2d");
-
-ctx.fillStyle="red";
-ctx.beginPath();
-ctx.moveTo(x,y);
-ctx.bezierCurveTo(x-10,y-10,x-20,y+10,x,y+20);
-ctx.bezierCurveTo(x+20,y+10,x+10,y-10,x,y);
-ctx.fill();
+/* grow branches step: called in animation loop */
+function growBranches(){
+  const newBranches = [];
+  branches.forEach(b=>{
+    // advance growth
+    if(b.progress < 1){
+      b.progress += 0.02; // growth speed (tweakable)
+      if(b.progress>1) b.progress=1;
+    } else if(!b.split){
+      b.split = true;
+      // if still thick -> split into two
+      if(b.width > 3){
+        const x2 = b.x + Math.cos(toRad(b.angle))*b.len;
+        const y2 = b.y + Math.sin(toRad(b.angle))*b.len;
+        // create left and right
+        const spread = 20 + Math.random()*18;
+        newBranches.push({
+          x: x2, y: y2,
+          len: b.len * (0.68 + Math.random()*0.07),
+          angle: b.angle - spread * (0.8 + Math.random()*0.4),
+          width: b.width * 0.66,
+          progress: 0, split:false
+        });
+        newBranches.push({
+          x: x2, y: y2,
+          len: b.len * (0.68 + Math.random()*0.07),
+          angle: b.angle + spread * (0.8 + Math.random()*0.4),
+          width: b.width * 0.66,
+          progress: 0, split:false
+        });
+      } else {
+        // thin branch -> create leaf/particle spawn points along its end
+        const xend = b.x + Math.cos(toRad(b.angle))*b.len;
+        const yend = b.y + Math.sin(toRad(b.angle))*b.len;
+        // spawn several particles near end to fly to canopy
+        const spawn = 6 + Math.floor(Math.random()*6);
+        for(let i=0;i<spawn;i++){
+          spawnParticle(xend + (Math.random()-0.5)*30, yend + (Math.random()-0.5)*30);
+        }
+      }
+    }
+  });
+  // append new branches
+  branches = branches.concat(newBranches);
 }
+
+/* spawn a moving particle (heart) */
+function spawnParticle(sx, sy){
+  // assign a target later from canopyTargets (when available)
+  const p = {
+    x: sx,
+    y: sy,
+    vx: (Math.random()-0.5)*1.6,
+    vy: (Math.random()-0.7)*1.2 - 1.0,
+    size: 10 + Math.random()*12,
+    opacity: 0,
+    target: null,
+    state: 'rising' // rising -> seek -> settle
+  };
+  particles.push(p);
+}
+
+/* helper degrees->radians */
+function toRad(d){ return d * Math.PI/180; }
+
+/* draw branches & trunk */
+function drawBranches(){
+  ctx.lineCap = "round";
+  branches.forEach(b=>{
+    // compute current end point based on progress
+    const progress = Math.min(1, b.progress);
+    const x2 = b.x + Math.cos(toRad(b.angle)) * b.len * progress;
+    const y2 = b.y + Math.sin(toRad(b.angle)) * b.len * progress;
+    ctx.strokeStyle = b.width>6 ? "#48302a" : "#5a3a2a";
+    ctx.lineWidth = Math.max(1, b.width * (0.9 - 0.5*(1-progress)));
+    ctx.beginPath();
+    ctx.moveTo(b.x, b.y);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  });
+}
+
+/* animate particles: rise from branch ends then attract to canopy target */
+function updateParticles(){
+  // If canopyTargets not prepared, skip
+  particles.forEach((p, idx)=>{
+    if(p.state === 'rising'){
+      // move slightly upward & fade in
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.05; // gravity small
+      p.opacity += 0.04;
+      if(p.opacity>1) p.opacity=1;
+      // after some time assign target
+      if(Math.random() < 0.02 || p.y < H*0.45){
+        // pick nearest free canopy target
+        let best = null, bestIdx = -1;
+        for(let i=0;i<canopyTargets.length;i++){
+          if(canopyTargets[i].taken) continue;
+          const d = dist(p.x,p.y,canopyTargets[i].x, canopyTargets[i].y);
+          if(best===null || d < best){
+            best = d; bestIdx = i;
+          }
+        }
+        if(bestIdx >= 0){
+          p.target = canopyTargets[bestIdx];
+          canopyTargets[bestIdx].taken = true;
+          p.state = 'seeking';
+        } else {
+          // no target left, gently settle
+          p.state = 'settle';
+        }
+      }
+    } else if(p.state === 'seeking' && p.target){
+      // steering towards target with easing
+      const ax = (p.target.x - p.x) * 0.06;
+      const ay = (p.target.y - p.y) * 0.06;
+      p.vx = (p.vx + ax) * 0.98;
+      p.vy = (p.vy + ay) * 0.98;
+      p.x += p.vx;
+      p.y += p.vy;
+      // reduce size slightly as it settles
+      p.size *= 0.995;
+      // if close enough -> settle
+      if(dist(p.x,p.y,p.target.x,p.target.y) < 6){
+        p.state = 'settled';
+        p.x = p.target.x;
+        p.y = p.target.y;
+        p.vx = 0; p.vy = 0; p.opacity = 1;
+      }
+    } else if(p.state === 'settle'){
+      // slow down and fade
+      p.vx *= 0.96; p.vy *= 0.98;
+      p.x += p.vx; p.y += p.vy;
+      p.opacity *= 0.995;
+    }
+  });
+}
+
+/* draw all heart-particles */
+function drawParticles(){
+  particles.forEach(p=>{
+    ctx.save();
+    ctx.globalAlpha = p.opacity;
+    drawHeart(ctx, p.x, p.y, p.size);
+    ctx.restore();
+  });
+}
+
+/* heart draw helper (rounded heart made from rotated square + circles) */
+function drawHeart(ctx, x, y, s){
+  ctx.save();
+  ctx.translate(x,y);
+  ctx.rotate(-Math.PI/4);
+  // square body
+  ctx.fillStyle = "#ff6b86";
+  ctx.fillRect(-s/2, -s/2, s, s);
+  // circles
+  ctx.beginPath();
+  ctx.fillStyle = "#ff5b79";
+  ctx.arc(-s/2, -s/2 + s/2, s/2, 0, Math.PI*2);
+  ctx.arc(s/2, -s/2 + s/2, s/2, 0, Math.PI*2);
+  ctx.fill();
+  ctx.restore();
+}
+
+/* distance */
+function dist(x1,y1,x2,y2){
+  const dx = x1-x2, dy = y1-y2;
+  return Math.sqrt(dx*dx + dy*dy);
+}
+
+/* draw a subtle vignette / cinematic lights */
+function drawBackdrop(){
+  // soft radial glow behind tree
+  const grd = ctx.createRadialGradient(W/2, H*0.32, 50, W/2, H*0.32, Math.max(W,H)*0.9);
+  grd.addColorStop(0, "rgba(255,245,240,0.9)");
+  grd.addColorStop(1, "rgba(246,238,230,0.0)");
+  ctx.fillStyle = grd;
+  ctx.fillRect(0,0,W,H);
+}
+
+/* spawn canopy targets and reset any previous taken flags */
+function prepareCanopy(){
+  generateCanopyTargets();
+  // randomize order to create natural look
+  for(let i=0;i<canopyTargets.length;i++){
+    canopyTargets[i].taken = false;
+  }
+}
+
+/* main animation loop */
+function animate(now){
+  if(!animRunning) return;
+  if(!t0) t0 = now;
+  const elapsed = now - t0;
+
+  // clear
+  ctx.clearRect(0,0,W,H);
+
+  // cinematic backdrop
+  drawBackdrop();
+
+  // grow branches and draw them
+  growBranches();
+  drawBranches();
+
+  // occasionally spawn more particles from thin branch ends
+  if(Math.random() < 0.018 && particles.length < 420){
+    // pick a random branch end (thin ones)
+    let thin = branches.filter(b=> b.width <= 4 && b.progress >= 1);
+    if(thin.length > 0){
+      const s = thin[Math.floor(Math.random()*thin.length)];
+      const ex = s.x + Math.cos(toRad(s.angle))*s.len;
+      const ey = s.y + Math.sin(toRad(s.angle))*s.len;
+      // spawn 1-3
+      const n = 1 + Math.floor(Math.random()*3);
+      for(let k=0;k<n;k++) spawnParticle(ex + (Math.random()-0.5)*14, ey + (Math.random()-0.5)*14);
+    }
+  }
+
+  // update + draw particles (hearts)
+  updateParticles();
+  drawParticles();
+
+  // if a high percentage of canopyTargets are taken, we consider canopy formed
+  const takenCount = canopyTargets.filter(p=>p.taken).length;
+  if(canopyTargets.length > 0 && takenCount / canopyTargets.length > 0.76 && !window._canopyDone){
+    // mark done and trigger reveal of secondary message shortly
+    window._canopyDone = true;
+    setTimeout(()=> revealSecondary(), 900);
+    // move tree slightly left to make room for message
+    moveTreeLeft();
+  }
+
+  // draw subtle floating fancy hearts in background (parallax)
+  // small decorative hearts
+  for(let i=0;i<8;i++){
+    const sx = (i*123 + (elapsed*0.02)) % W;
+    const sy = (50 + ((i*67) % 300) + Math.sin((elapsed*0.001)+(i))*20);
+    drawHeart(ctx, sx, sy, 14);
+  }
+
+  requestAnimationFrame(animate);
+}
+
+/* shift tree left a bit visually by translating canvas drawing
+   (we implement by applying a global translation for branch drawing and particle drawing).
+   Simpler approach: set a global offset variable used to draw branches/particles.
+*/
+let treeOffsetX = 0;
+function moveTreeLeft(){
+  const target = -Math.min(230, W*0.18);
+  const step = () => {
+    treeOffsetX += (target - treeOffsetX) * 0.06;
+    // apply by adjusting branches' x temporarily: we'll just shift canvas before drawing
+    // after shift settles, stop
+    if(Math.abs(target - treeOffsetX) > 0.5){
+      requestAnimationFrame(step);
+    }
+  };
+  step();
+}
+
+/* We need to apply treeOffsetX when drawing branches & particles: modify draw functions accordingly.
+   To avoid duplicating code, we'll wrap drawing calls with save/translate/restore using treeOffsetX.
+*/
+function drawBranches(){
+  ctx.save();
+  ctx.translate(treeOffsetX, 0);
+  ctx.lineCap = "round";
+  branches.forEach(b=>{
+    const progress = Math.min(1, b.progress);
+    const x2 = b.x + Math.cos(toRad(b.angle)) * b.len * progress;
+    const y2 = b.y + Math.sin(toRad(b.angle)) * b.len * progress;
+    ctx.strokeStyle = b.width>6 ? "#48302a" : "#5a3a2a";
+    ctx.lineWidth = Math.max(1, b.width * (0.95 - 0.45*(1-progress)));
+    ctx.beginPath();
+    ctx.moveTo(b.x, b.y);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+  });
+  ctx.restore();
+}
+
+function drawParticles(){
+  ctx.save();
+  ctx.translate(treeOffsetX, 0);
+  particles.forEach(p=>{
+    ctx.save();
+    ctx.globalAlpha = p.opacity;
+    drawHeart(ctx, p.x, p.y, p.size);
+    ctx.restore();
+  });
+  ctx.restore();
+}
+
+/* reveal secondary message */
+function revealSecondary(){
+  secondary.classList.add('show');
+}
+
+/* start sequence when user clicks start */
+startBtn.addEventListener('click', startSequence);
+
+function startSequence(){
+  // hide start UI
+  startBtn.style.display = 'none';
+  // show envelope and animate flap open
+  envelope.style.display = 'block';
+  setTimeout(()=>{ flap.classList.add('open'); }, 250);
+
+  // expose canvas and begin animations after short delay
+  canvas.style.display = 'block';
+  // prepare canopy shape
+  prepareCanopy();
+  // start branch trunk
+  addInitialTrunk();
+  // enable animation loop
+  animRunning = true;
+  requestAnimationFrame(animate);
+
+  // after a short moment begin gentle repeated spawning to ensure canopy fills
+  const spawnInterval = setInterval(()=>{
+    if(!animRunning) { clearInterval(spawnInterval); return; }
+    // spawn from trunk top occasionally
+    const trunkTop = branches[0] ? { x: branches[0].x, y: branches[0].y - branches[0].len } : {x:W/2, y:H*0.5};
+    spawnParticle(trunkTop.x + (Math.random()-0.5)*20, trunkTop.y + (Math.random()-0.5)*20);
+    // stop spawning proactively if canopy nearly done
+    const takenCount = canopyTargets.filter(p=>p.taken).length;
+    if(canopyTargets.length>0 && takenCount / canopyTargets.length > 0.9){
+      clearInterval(spawnInterval);
+    }
+  }, 350);
+
+  // load/play YouTube music by dynamically creating iframe (user gesture)
+  createYouTubeIframe();
+
+  // close envelope flap visually after a bit (so envelope sits under tree)
+  setTimeout(()=>{ envelope.style.opacity = 0.0; }, 1400);
+}
+
+/* create youtube iframe with autoplay (triggered by user click to avoid blockers) */
+function createYouTubeIframe(){
+  if(ytIframe) return;
+  ytIframe = document.createElement('iframe');
+  ytIframe.style.display = 'none';
+  ytIframe.width = 0; ytIframe.height = 0;
+  ytIframe.allow = "autoplay";
+  ytIframe.src = `https://www.youtube.com/embed/${YT_ID}?autoplay=1&loop=1&playlist=${YT_ID}&controls=0&rel=0&modestbranding=1`;
+  document.body.appendChild(ytIframe);
+}
+
+/* initial canopy prepare */
+generateCanopyTargets();
+
+/* Counter real-time */
+function updateCounter(){
+  const now = new Date();
+  let diff = now - startDate;
+  if(diff < 0) diff = 0;
+  const days = Math.floor(diff / (1000*60*60*24));
+  const hours = Math.floor(diff / (1000*60*60)) % 24;
+  const minutes = Math.floor(diff / (1000*60)) % 60;
+  const seconds = Math.floor(diff / 1000) % 60;
+  counterEl.innerHTML = `Mi amor por ti comenzó hace:<br>${days} días ${hours} horas ${minutes} min ${seconds} seg`;
+}
+setInterval(updateCounter, 1000);
+updateCounter();
+
+/* Helper: small debugging hook to stop anim */
+window._stopAnim = () => { animRunning = false; };
 
 </script>
-
 </body>
 </html>
