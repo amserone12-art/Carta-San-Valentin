@@ -3,240 +3,278 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Carta San Valentín</title>
+<title>Carta Cine</title>
 
 <style>
 body{
 margin:0;
-font-family: 'Segoe UI', sans-serif;
-background:#f5e6d3;
-display:flex;
-justify-content:center;
-align-items:center;
-height:100vh;
+background:linear-gradient(#f5e9da,#f1dcc2);
+font-family:'Segoe UI',sans-serif;
 overflow:hidden;
-}
-
-/* CONTENEDOR */
-.container{
 text-align:center;
 }
 
-/* CORAZON INICIAL */
-.heart-btn{
-width:140px;
-height:140px;
-background:red;
-position:relative;
-transform:rotate(-45deg);
-margin:auto;
+/* TITULO */
+.title{
+position:absolute;
+top:6%;
+width:100%;
+font-size:34px;
+font-weight:bold;
+color:#7a1c1c;
+z-index:10;
+}
+
+/* CORAZON BOTON */
+.heartBtn{
+position:absolute;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%) rotate(-45deg);
+width:170px;
+height:170px;
+background:#ff1a4d;
 cursor:pointer;
 animation:beat 1.2s infinite;
-z-index:2;
+z-index:10;
 }
 
-.heart-btn:before,
-.heart-btn:after{
+.heartBtn:before,.heartBtn:after{
 content:"";
-width:140px;
-height:140px;
-background:red;
-border-radius:50%;
 position:absolute;
+width:170px;
+height:170px;
+background:#ff1a4d;
+border-radius:50%;
 }
 
-.heart-btn:before{ top:-70px; left:0;}
-.heart-btn:after{ left:70px; top:0;}
+.heartBtn:before{ top:-85px;}
+.heartBtn:after{ left:85px;}
 
 @keyframes beat{
-0%{ transform:scale(1) rotate(-45deg);}
-50%{ transform:scale(1.1) rotate(-45deg);}
-100%{ transform:scale(1) rotate(-45deg);}
+0%,100%{ transform:translate(-50%,-50%) scale(1) rotate(-45deg);}
+50%{ transform:translate(-50%,-50%) scale(1.12) rotate(-45deg);}
 }
 
-/* TEXTO CENTRAL */
-.main-text{
+/* SOBRE */
+.envelope{
 position:absolute;
-width:100%;
-top:40%;
-left:0;
-font-size:28px;
-font-weight:bold;
-color:#5a1a1a;
-z-index:3;
-pointer-events:none;
-}
-
-/* CARTA */
-.card{
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+width:320px;
+height:220px;
+background:#fff;
+border-radius:10px;
 display:none;
-margin-top:20px;
-animation:fade 2s forwards;
+z-index:9;
 }
 
-@keyframes fade{
-from{opacity:0;}
-to{opacity:1;}
-}
-
-/* ARBOL */
-.tree{
-margin:auto;
-width:200px;
-height:300px;
-position:relative;
-}
-
-.trunk{
-width:30px;
-height:0;
-background:#5c3a21;
-margin:auto;
-animation:growTrunk 2s forwards;
-}
-
-@keyframes growTrunk{
-to{ height:150px;}
-}
-
-/* RAMAS */
-.branch{
+.flap{
+position:absolute;
+top:-110px;
+left:0;
 width:0;
-height:6px;
-background:#5c3a21;
+height:0;
+border-left:160px solid transparent;
+border-right:160px solid transparent;
+border-bottom:110px solid #f8f8f8;
+transform-origin:bottom;
+animation:openFlap 2s forwards;
+}
+
+@keyframes openFlap{
+to{ transform:rotateX(180deg);}
+}
+
+/* CANVAS */
+canvas{
 position:absolute;
-top:40%;
-animation:growBranch 2s forwards;
-}
-
-.branch.left{ left:40%; transform:rotate(-35deg);}
-.branch.right{ right:40%; transform:rotate(35deg);}
-
-@keyframes growBranch{
-to{ width:90px;}
-}
-
-/* CORAZONES FLORES */
-.leaf{
-width:22px;
-height:22px;
-background:red;
-position:absolute;
-transform:rotate(-45deg);
-opacity:0;
-animation:pop 1s forwards;
-}
-
-.leaf:before,
-.leaf:after{
-content:"";
-width:22px;
-height:22px;
-background:red;
-border-radius:50%;
-position:absolute;
-}
-
-.leaf:before{ top:-11px;}
-.leaf:after{ left:11px;}
-
-@keyframes pop{
-to{ opacity:1;}
+top:0;
+left:0;
 }
 
 /* FOTO */
 .photo{
-margin-top:20px;
+position:absolute;
+bottom:150px;
+width:100%;
 }
 
 .photo img{
-width:200px;
+width:220px;
 border-radius:15px;
-box-shadow:0 5px 15px rgba(0,0,0,0.2);
+box-shadow:0 15px 30px rgba(0,0,0,.2);
 }
 
 /* CONTADOR */
 .counter{
-margin-top:20px;
-font-size:20px;
-color:#5a1a1a;
+position:absolute;
+bottom:40px;
+width:100%;
+font-size:22px;
 font-weight:bold;
+color:#7a1c1c;
 }
+
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="title">¿Hola Amoti quieres ser mi San Valentin?</div>
 
-<div class="main-text">¿Hola Amoti quieres ser mi San Valentin?</div>
+<div class="heartBtn" onclick="startExperience()"></div>
 
-<div class="heart-btn" onclick="openCard()"></div>
-
-<div class="card" id="card">
-
-<div class="tree">
-<div class="trunk"></div>
-<div class="branch left"></div>
-<div class="branch right"></div>
-
-<!-- CORAZONES -->
-<div class="leaf" style="top:20%; left:35%; animation-delay:2s"></div>
-<div class="leaf" style="top:18%; right:35%; animation-delay:2.3s"></div>
-<div class="leaf" style="top:10%; left:45%; animation-delay:2.6s"></div>
-<div class="leaf" style="top:10%; right:45%; animation-delay:2.9s"></div>
-<div class="leaf" style="top:5%; left:50%; animation-delay:3.2s"></div>
-
+<div class="envelope" id="envelope">
+<div class="flap"></div>
 </div>
 
-<h2>Te amo muchísimo ❤️</h2>
+<canvas id="canvas"></canvas>
 
-<!-- FOTO PERSONAL -->
 <div class="photo">
-<img src="TU-FOTO.jpg" alt="Foto especial">
+<img src="TU-FOTO.jpg">
 </div>
 
 <div class="counter" id="counter"></div>
 
-</div>
-
-</div>
-
 <!-- MUSICA -->
 <iframe width="0" height="0"
 src="https://www.youtube.com/embed/OhJ-S9Nrh7Q?autoplay=1&loop=1&playlist=OhJ-S9Nrh7Q"
-frameborder="0"
-allow="autoplay">
-</iframe>
+allow="autoplay"></iframe>
 
 <script>
 
-function openCard(){
-document.querySelector('.heart-btn').style.display='none';
-document.querySelector('.card').style.display='block';
+const canvas=document.getElementById("canvas");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let progress=0;
+let particles=[];
+let petals=[];
+let hearts=[];
+
+/* PARTICULAS ROMANTICAS */
+for(let i=0;i<40;i++){
+particles.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+r:Math.random()*2+1
+});
 }
 
-/* CONTADOR DESDE OCTUBRE 2024 */
-const startDate = new Date("2024-10-01T00:00:00");
-
-function updateCounter(){
-const now = new Date();
-const diff = now - startDate;
-
-const days = Math.floor(diff / (1000*60*60*24));
-const hours = Math.floor((diff / (1000*60*60)) % 24);
-const minutes = Math.floor((diff / (1000*60)) % 60);
-const seconds = Math.floor((diff / 1000) % 60);
-
-document.getElementById("counter").innerHTML =
-"Mi amor por ti comenzó hace:<br>" +
-days+" días "+
-hours+" horas "+
-minutes+" min "+
-seconds+" seg";
+/* FLORES CAYENDO */
+for(let i=0;i<20;i++){
+petals.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+vy:Math.random()*0.5+0.3
+});
 }
 
-setInterval(updateCounter,1000);
+/* DIBUJAR CORAZON */
+function heart(x,y,s){
+ctx.save();
+ctx.translate(x,y);
+ctx.rotate(-Math.PI/4);
+ctx.fillStyle="#ff1a4d";
+ctx.fillRect(0,0,s,s);
+ctx.beginPath();
+ctx.arc(0,s/2,s/2,0,Math.PI*2);
+ctx.arc(s/2,0,s/2,0,Math.PI*2);
+ctx.fill();
+ctx.restore();
+}
+
+/* ARBOL */
+function tree(p){
+
+let x=canvas.width/2;
+let y=canvas.height*0.8;
+
+ctx.strokeStyle="#5a3a21";
+ctx.lineCap="round";
+
+/* TRONCO */
+ctx.lineWidth=8;
+ctx.beginPath();
+ctx.moveTo(x,y);
+ctx.lineTo(x,y-250*p);
+ctx.stroke();
+
+/* RAMAS */
+ctx.lineWidth=5;
+
+ctx.beginPath();
+ctx.moveTo(x,y-180*p);
+ctx.lineTo(x-160*p,y-300*p);
+ctx.stroke();
+
+ctx.beginPath();
+ctx.moveTo(x,y-180*p);
+ctx.lineTo(x+160*p,y-300*p);
+ctx.stroke();
+
+}
+
+/* LOOP */
+function animate(){
+
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+/* PARTICULAS */
+particles.forEach(p=>{
+ctx.fillStyle="rgba(255,255,255,0.5)";
+ctx.beginPath();
+ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+ctx.fill();
+});
+
+/* FLORES */
+petals.forEach(p=>{
+heart(p.x,p.y,10);
+p.y+=p.vy;
+if(p.y>canvas.height) p.y=0;
+});
+
+/* ARBOL */
+if(progress<1) progress+=0.002;
+tree(progress);
+
+/* CORAZON SUPERIOR */
+if(progress>0.85){
+heart(canvas.width/2,canvas.height*0.25,120*(progress-0.85)*6);
+}
+
+requestAnimationFrame(animate);
+}
+
+/* INICIO */
+function startExperience(){
+document.querySelector(".heartBtn").style.display="none";
+document.getElementById("envelope").style.display="block";
+setTimeout(()=>{
+animate();
+},2000);
+}
+
+/* CONTADOR */
+const startDate=new Date("2024-10-01T00:00:00");
+
+setInterval(()=>{
+const now=new Date();
+const diff=now-startDate;
+
+let d=Math.floor(diff/(1000*60*60*24));
+let h=Math.floor((diff/(1000*60*60))%24);
+let m=Math.floor((diff/(1000*60))%60);
+let s=Math.floor((diff/1000)%60);
+
+document.getElementById("counter").innerHTML=
+"Mi amor por ti comenzó hace:<br>"+
+d+" días "+h+" horas "+m+" min "+s+" seg";
+},1000);
 
 </script>
 
