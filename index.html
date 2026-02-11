@@ -3,26 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Carta Cine</title>
+<title>Carta Ultra Final</title>
 
 <style>
 body{
 margin:0;
-background:linear-gradient(#f5e9da,#f1dcc2);
-font-family:'Segoe UI',sans-serif;
 overflow:hidden;
-text-align:center;
+font-family:'Segoe UI',sans-serif;
+background:radial-gradient(circle at center,#f6eadb,#edd4b5);
 }
 
 /* TITULO */
 .title{
 position:absolute;
-top:6%;
+top:5%;
 width:100%;
-font-size:34px;
+text-align:center;
+font-size:36px;
 font-weight:bold;
 color:#7a1c1c;
-z-index:10;
+z-index:20;
 }
 
 /* CORAZON BOTON */
@@ -31,80 +31,42 @@ position:absolute;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%) rotate(-45deg);
-width:170px;
-height:170px;
+width:180px;
+height:180px;
 background:#ff1a4d;
 cursor:pointer;
 animation:beat 1.2s infinite;
-z-index:10;
+z-index:20;
 }
 
 .heartBtn:before,.heartBtn:after{
 content:"";
 position:absolute;
-width:170px;
-height:170px;
+width:180px;
+height:180px;
 background:#ff1a4d;
 border-radius:50%;
 }
-
-.heartBtn:before{ top:-85px;}
-.heartBtn:after{ left:85px;}
+.heartBtn:before{ top:-90px;}
+.heartBtn:after{ left:90px;}
 
 @keyframes beat{
 0%,100%{ transform:translate(-50%,-50%) scale(1) rotate(-45deg);}
-50%{ transform:translate(-50%,-50%) scale(1.12) rotate(-45deg);}
-}
-
-/* SOBRE */
-.envelope{
-position:absolute;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-width:320px;
-height:220px;
-background:#fff;
-border-radius:10px;
-display:none;
-z-index:9;
-}
-
-.flap{
-position:absolute;
-top:-110px;
-left:0;
-width:0;
-height:0;
-border-left:160px solid transparent;
-border-right:160px solid transparent;
-border-bottom:110px solid #f8f8f8;
-transform-origin:bottom;
-animation:openFlap 2s forwards;
-}
-
-@keyframes openFlap{
-to{ transform:rotateX(180deg);}
-}
-
-/* CANVAS */
-canvas{
-position:absolute;
-top:0;
-left:0;
+50%{ transform:translate(-50%,-50%) scale(1.15) rotate(-45deg);}
 }
 
 /* FOTO */
 .photo{
 position:absolute;
-bottom:150px;
+bottom:140px;
 width:100%;
+text-align:center;
+z-index:10;
 }
-
 .photo img{
-width:220px;
+width:230px;
 border-radius:15px;
-box-shadow:0 15px 30px rgba(0,0,0,.2);
+box-shadow:0 15px 35px rgba(0,0,0,.3);
 }
 
 /* CONTADOR */
@@ -112,9 +74,17 @@ box-shadow:0 15px 30px rgba(0,0,0,.2);
 position:absolute;
 bottom:40px;
 width:100%;
-font-size:22px;
+text-align:center;
+font-size:24px;
 font-weight:bold;
 color:#7a1c1c;
+z-index:10;
+}
+
+canvas{
+position:absolute;
+top:0;
+left:0;
 }
 
 </style>
@@ -122,13 +92,8 @@ color:#7a1c1c;
 
 <body>
 
-<div class="title">¿Hola Amoti quieres ser mi San Valentin?</div>
-
-<div class="heartBtn" onclick="startExperience()"></div>
-
-<div class="envelope" id="envelope">
-<div class="flap"></div>
-</div>
+<div class="title" id="title">¿Hola Amoti quieres ser mi San Valentin?</div>
+<div class="heartBtn" onclick="start()"></div>
 
 <canvas id="canvas"></canvas>
 
@@ -150,30 +115,41 @@ const ctx=canvas.getContext("2d");
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight;
 
+/* SISTEMAS */
 let progress=0;
-let particles=[];
+let lights=[];
 let petals=[];
-let hearts=[];
+let floatingHearts=[];
+let mouse={x:0,y:0};
 
-/* PARTICULAS ROMANTICAS */
-for(let i=0;i<40;i++){
-particles.push({
+/* LUCES */
+for(let i=0;i<60;i++){
+lights.push({
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
 r:Math.random()*2+1
 });
 }
 
-/* FLORES CAYENDO */
-for(let i=0;i<20;i++){
+/* PETALOS */
+for(let i=0;i<25;i++){
 petals.push({
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
-vy:Math.random()*0.5+0.3
+vy:Math.random()*0.6+0.3
 });
 }
 
-/* DIBUJAR CORAZON */
+/* CORAZONES PARALLAX */
+for(let i=0;i<20;i++){
+floatingHearts.push({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+depth:Math.random()*1
+});
+}
+
+/* CORAZON */
 function heart(x,y,s){
 ctx.save();
 ctx.translate(x,y);
@@ -189,7 +165,6 @@ ctx.restore();
 
 /* ARBOL */
 function tree(p){
-
 let x=canvas.width/2;
 let y=canvas.height*0.8;
 
@@ -197,25 +172,39 @@ ctx.strokeStyle="#5a3a21";
 ctx.lineCap="round";
 
 /* TRONCO */
-ctx.lineWidth=8;
+ctx.lineWidth=9;
 ctx.beginPath();
 ctx.moveTo(x,y);
-ctx.lineTo(x,y-250*p);
+ctx.lineTo(x,y-260*p);
 ctx.stroke();
 
 /* RAMAS */
-ctx.lineWidth=5;
-
+ctx.lineWidth=6;
 ctx.beginPath();
 ctx.moveTo(x,y-180*p);
-ctx.lineTo(x-160*p,y-300*p);
+ctx.lineTo(x-170*p,y-320*p);
 ctx.stroke();
 
 ctx.beginPath();
 ctx.moveTo(x,y-180*p);
-ctx.lineTo(x+160*p,y-300*p);
+ctx.lineTo(x+170*p,y-320*p);
 ctx.stroke();
+}
 
+/* TEXTO TYPE */
+let typed=false;
+function typeText(){
+if(typed) return;
+typed=true;
+let t="¿Hola Amoti quieres ser mi San Valentin?";
+let el=document.getElementById("title");
+el.innerHTML="";
+let i=0;
+let interval=setInterval(()=>{
+el.innerHTML+=t[i];
+i++;
+if(i>=t.length) clearInterval(interval);
+},50);
 }
 
 /* LOOP */
@@ -223,19 +212,26 @@ function animate(){
 
 ctx.clearRect(0,0,canvas.width,canvas.height);
 
-/* PARTICULAS */
-particles.forEach(p=>{
-ctx.fillStyle="rgba(255,255,255,0.5)";
+/* LUCES */
+lights.forEach(l=>{
+ctx.fillStyle="rgba(255,255,255,0.4)";
 ctx.beginPath();
-ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+ctx.arc(l.x,l.y,l.r,0,Math.PI*2);
 ctx.fill();
 });
 
-/* FLORES */
+/* PETALOS */
 petals.forEach(p=>{
 heart(p.x,p.y,10);
 p.y+=p.vy;
 if(p.y>canvas.height) p.y=0;
+});
+
+/* PARALLAX */
+floatingHearts.forEach(h=>{
+h.x+=(mouse.x-canvas.width/2)*0.0005*(h.depth);
+h.y+=(mouse.y-canvas.height/2)*0.0005*(h.depth);
+heart(h.x,h.y,12*(1-h.depth));
 });
 
 /* ARBOL */
@@ -244,19 +240,23 @@ tree(progress);
 
 /* CORAZON SUPERIOR */
 if(progress>0.85){
-heart(canvas.width/2,canvas.height*0.25,120*(progress-0.85)*6);
+heart(canvas.width/2,canvas.height*0.25,140*(progress-0.85)*6);
 }
 
 requestAnimationFrame(animate);
 }
 
-/* INICIO */
-function startExperience(){
+/* MOUSE */
+window.addEventListener("mousemove",e=>{
+mouse.x=e.clientX;
+mouse.y=e.clientY;
+});
+
+/* START */
+function start(){
 document.querySelector(".heartBtn").style.display="none";
-document.getElementById("envelope").style.display="block";
-setTimeout(()=>{
+typeText();
 animate();
-},2000);
 }
 
 /* CONTADOR */
